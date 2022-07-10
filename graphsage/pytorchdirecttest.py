@@ -64,41 +64,44 @@ def main():
     'graphdata/snap/as-Skitter/as-Skitter.mtx',
     'graphdata/snap/roadNet-TX/roadNet-TX.mtx'
     ]
-    ngpu=1
+    #ngpu=1
     gpuinst='0'
     gpu_list=[2,4]
+    embedding_size=[16,32,64,128,256]
     for n in range(2):
         ngpu=gpu_list[n]
         gpuinst='0'
         for i in range(1,ngpu):
             gpuinst=gpuinst+','+str(i)
         for i in range(10):
-            source=mtx_path_list[i]
-            for j in range(ngpu):
-                os.system('touch intermediate'+str(j)+'.out')
-            command='python train_sampling_multi_gpu.py --gpu '+gpuinst+' --graph-device uva --data-device uva --source '+source
-            os.system(command)
-            print(command)
+            for k in range(5):
+                embed=embedding_size[k]
+                source=mtx_path_list[i]
+                for j in range(ngpu):
+                    os.system('touch intermediate'+str(j)+'.out')
+                command='python train_sampling_multi_gpu.py --gpu '+gpuinst+' --graph-device uva --data-device uva --source '+source+' --nfeats '+str(embed)
+                os.system(command)
+                print(command)
 
-            writefile=open(str(i+1)+'.out','a')
-            writefile.write(source)
-            writefile.write('\n')
-            for j in range(ngpu):
-                myfile=open('intermediate'+str(j)+'.out','r')
-                #writefile=open(str(i+1)+'.out','w')
-                writefile.write(str(ngpu)+' '+str(j)+' ')
-                myline=myfile.readline()
-                myline=myfile.readline()
-                print('content')
-                print(myline)
-                writefile.write(myline)
+                writefile=open(str(i+1)+'.out','a')
+                writefile.write(source)
                 writefile.write('\n')
-                myfile.close()
-            writefile.close()
-            for j in range(ngpu):
-                os.system('rm intermediate'+str(j)+'.out')
-            #os.system('rm intermediate0.out')
-            #break
+                for j in range(ngpu):
+                    myfile=open('intermediate'+str(j)+'.out','r')
+                    #writefile=open(str(i+1)+'.out','w')
+                    writefile.write(str(ngpu)+' '+str(j)+' '+str(embed)+' ')
+                    myline=myfile.readline()
+                    myline=myfile.readline()
+                    print('content')
+                    print(myline)
+                    writefile.write(myline)
+                    writefile.write('\n')
+                    myfile.close()
+                writefile.close()
+                for j in range(ngpu):
+                    os.system('rm intermediate'+str(j)+'.out')
+                #os.system('rm intermediate0.out')
+                #break
 
 if __name__ == '__main__':
     main()

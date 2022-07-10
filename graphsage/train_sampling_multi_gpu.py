@@ -125,24 +125,27 @@ def run(proc_id, n_gpus, args, devices, data):
                 tic_step = time.time()
 
             # Load the input features as well as output labels
+            th.cuda.synchronize()
             start_fetch=time.time()
             batch_inputs, batch_labels = load_subtensor(train_nfeat, train_labels,
                                                         seeds, input_nodes, device)
+            th.cuda.synchronize()
             end_fetch=time.time()
             fetch=fetch+end_fetch-start_fetch
 
             blocks = [block.int().to(device) for block in blocks]
             # Compute loss and prediction
-            batch_pred = model(blocks, batch_inputs)
+            '''batch_pred = model(blocks, batch_inputs)
             loss = loss_fcn(batch_pred, batch_labels)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            '''
 
             if proc_id == 0:
                 iter_tput.append(len(seeds) * n_gpus / (time.time() - tic_step))
-            if step % args.log_every == 0 and proc_id == 0:
-                acc = compute_acc(batch_pred, batch_labels)
+            #if step % args.log_every == 0 and proc_id == 0:
+               # acc = compute_acc(batch_pred, batch_labels)
                 #print('Epoch {:05d} | Step {:05d} | Loss {:.4f} | Train Acc {:.4f} | Speed (samples/sec) {:.4f} | GPU {:.1f} MB'.format(
                  #   epoch, step, loss.item(), acc.item(), np.mean(iter_tput[3:]), th.cuda.max_memory_allocated() / 1000000))
         avg_fetch=avg_fetch+fetch
@@ -155,9 +158,9 @@ def run(proc_id, n_gpus, args, devices, data):
         #if proc_id == 0:
             #print('Epoch Time(s): {:.4f}'.format(toc - tic))
             #print('Fetch Time(s): {:.4f}'.format(fetch))
-        if epoch >= 5:
-            avg += toc - tic
-            '''if epoch % args.eval_every == 0 and epoch != 0:
+        #if epoch >= 5:
+        #    avg += toc - tic
+        '''if epoch % args.eval_every == 0 and epoch != 0:
                 if n_gpus == 1:
                     eval_acc = evaluate(
                         model, val_g, val_nfeat, val_labels, val_nid, devices[0])
@@ -170,16 +173,17 @@ def run(proc_id, n_gpus, args, devices, data):
                         model.module, test_g, test_nfeat, test_labels, test_nid, devices[0])
                 print('Eval Acc {:.4f}'.format(eval_acc))
                 print('Test Acc: {:.4f}'.format(test_acc))
-            '''
+        '''
     print('intermediate'+str(proc_id)+'.out')
-    print(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
+    #print(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
     outfile=open('intermediate'+str(proc_id)+'.out','a')
-    outfile.write(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
+    #outfile.write(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
+    outfile.write(str(avg_fetch / (epoch)))
     outfile.close()
     if n_gpus > 1:
         th.distributed.barrier()
     if proc_id == 0:
-        print('Avg epoch time: {}'.format(avg / (epoch - 4)))
+        #print('Avg epoch time: {}'.format(avg / (epoch - 4)))
         print('Avg fetch time: {}'.format(avg_fetch / (epoch)))
 
 if __name__ == '__main__':
@@ -211,6 +215,7 @@ if __name__ == '__main__':
                                 "'uva' to enable UnifiedTensor (GPU zero-copy access on "
                                 "pinned host memory).")
     argparser.add_argument('--source', type=str, default='error')
+    argparser.add_argument('--nfeats', type=int, default=256)
     args = argparser.parse_args()
 
     devices = list(map(int, args.gpu.split(',')))
@@ -244,7 +249,7 @@ if __name__ == '__main__':
     '''
     spmat=scipy.io.mmread(args.source)
     mygraph=dgl.from_scipy(spmat)
-    n_feats=256
+    n_feats=args.nfeats
     n_classes=7
     f_tensor=th.randn(mygraph.num_nodes(),n_feats)
     l_tensor=th.randint(0,7,(mygraph.num_nodes(),))
