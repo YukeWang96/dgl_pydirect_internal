@@ -12,6 +12,7 @@ import math
 import argparse
 from torch.nn.parallel import DistributedDataParallel
 import tqdm
+import scipy
 
 from model import SAGE
 from load_graph import load_reddit, inductive_split, load_ogb
@@ -96,7 +97,9 @@ def run(proc_id, n_gpus, args, devices, data):
         batch_size=args.batch_size,
         shuffle=True,
         drop_last=False,
-        num_workers=args.num_workers)
+        num_workers=args.num_workers,
+        use_uva=True
+        )
 
     # Define model and optimizer
     model = SAGE(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
@@ -108,10 +111,13 @@ def run(proc_id, n_gpus, args, devices, data):
 
     # Training loop
     avg = 0
+    avg_fetch=0
     iter_tput = []
     for epoch in range(args.num_epochs):
+        if proc_id==0:
+            print(epoch)
         tic = time.time()
-
+        fetch=0
         # Loop over the dataloader to sample the computation dependency graph as a list of
         # blocks.
         for step, (input_nodes, seeds, blocks) in enumerate(dataloader):
@@ -119,8 +125,12 @@ def run(proc_id, n_gpus, args, devices, data):
                 tic_step = time.time()
 
             # Load the input features as well as output labels
+            start_fetch=time.time()
             batch_inputs, batch_labels = load_subtensor(train_nfeat, train_labels,
                                                         seeds, input_nodes, device)
+            end_fetch=time.time()
+            fetch=fetch+end_fetch-start_fetch
+
             blocks = [block.int().to(device) for block in blocks]
             # Compute loss and prediction
             batch_pred = model(blocks, batch_inputs)
@@ -133,18 +143,21 @@ def run(proc_id, n_gpus, args, devices, data):
                 iter_tput.append(len(seeds) * n_gpus / (time.time() - tic_step))
             if step % args.log_every == 0 and proc_id == 0:
                 acc = compute_acc(batch_pred, batch_labels)
-                print('Epoch {:05d} | Step {:05d} | Loss {:.4f} | Train Acc {:.4f} | Speed (samples/sec) {:.4f} | GPU {:.1f} MB'.format(
-                    epoch, step, loss.item(), acc.item(), np.mean(iter_tput[3:]), th.cuda.max_memory_allocated() / 1000000))
-
+                #print('Epoch {:05d} | Step {:05d} | Loss {:.4f} | Train Acc {:.4f} | Speed (samples/sec) {:.4f} | GPU {:.1f} MB'.format(
+                 #   epoch, step, loss.item(), acc.item(), np.mean(iter_tput[3:]), th.cuda.max_memory_allocated() / 1000000))
+        avg_fetch=avg_fetch+fetch
         if n_gpus > 1:
             th.distributed.barrier()
 
         toc = time.time()
-        if proc_id == 0:
-            print('Epoch Time(s): {:.4f}'.format(toc - tic))
-            if epoch >= 5:
-                avg += toc - tic
-            if epoch % args.eval_every == 0 and epoch != 0:
+        #outfile=open('intermediate'+str(proc_id)+'.out','a')
+        #outfile.write(str(toc-tic)+' '+str(fetch))
+        #if proc_id == 0:
+            #print('Epoch Time(s): {:.4f}'.format(toc - tic))
+            #print('Fetch Time(s): {:.4f}'.format(fetch))
+        if epoch >= 5:
+            avg += toc - tic
+            '''if epoch % args.eval_every == 0 and epoch != 0:
                 if n_gpus == 1:
                     eval_acc = evaluate(
                         model, val_g, val_nfeat, val_labels, val_nid, devices[0])
@@ -157,11 +170,17 @@ def run(proc_id, n_gpus, args, devices, data):
                         model.module, test_g, test_nfeat, test_labels, test_nid, devices[0])
                 print('Eval Acc {:.4f}'.format(eval_acc))
                 print('Test Acc: {:.4f}'.format(test_acc))
-
+            '''
+    print('intermediate'+str(proc_id)+'.out')
+    print(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
+    outfile=open('intermediate'+str(proc_id)+'.out','a')
+    outfile.write(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
+    outfile.close()
     if n_gpus > 1:
         th.distributed.barrier()
     if proc_id == 0:
         print('Avg epoch time: {}'.format(avg / (epoch - 4)))
+        print('Avg fetch time: {}'.format(avg_fetch / (epoch)))
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser("multi-gpu training")
@@ -191,11 +210,12 @@ if __name__ == '__main__':
                                 "Use 'cpu' to keep the features on host memory and "
                                 "'uva' to enable UnifiedTensor (GPU zero-copy access on "
                                 "pinned host memory).")
+    argparser.add_argument('--source', type=str, default='error')
     args = argparser.parse_args()
 
     devices = list(map(int, args.gpu.split(',')))
     n_gpus = len(devices)
-
+    '''
     if args.dataset == 'reddit':
         g, n_classes = load_reddit()
     elif args.dataset == 'ogbn-products':
@@ -208,7 +228,7 @@ if __name__ == '__main__':
         g.ndata.pop('year')
     else:
         raise Exception('unknown dataset')
-
+    
     if args.inductive:
         train_g, val_g, test_g = inductive_split(g)
         train_nfeat = train_g.ndata.pop('features')
@@ -221,7 +241,39 @@ if __name__ == '__main__':
         train_g = val_g = test_g = g
         train_nfeat = val_nfeat = test_nfeat = g.ndata.pop('features')
         train_labels = val_labels = test_labels = g.ndata.pop('labels')
+    '''
+    spmat=scipy.io.mmread(args.source)
+    mygraph=dgl.from_scipy(spmat)
+    n_feats=256
+    n_classes=7
+    f_tensor=th.randn(mygraph.num_nodes(),n_feats)
+    l_tensor=th.randint(0,7,(mygraph.num_nodes(),))
+    l_tensor=l_tensor.type(th.int64)
+    testmask=th.zeros(mygraph.num_nodes())
+    testmask=testmask.type(th.bool)
+    trainmask=th.ones(mygraph.num_nodes())
+    trainmask=trainmask.type(th.bool)
+    mygraph.ndata['label']=l_tensor
+    mygraph.ndata['feat']=f_tensor
+    mygraph.ndata['test_mask']=testmask
+    mygraph.ndata['train_mask']=trainmask
+    mygraph.ndata['val_mask']=testmask
+    mygraph.ndata['features']=f_tensor
+    mygraph.ndata['labels']=l_tensor
+    mygraph = dgl.as_heterograph(mygraph)
+    train_g = val_g = test_g = mygraph
+    train_g.create_formats_()
+    val_g.create_formats_()
+    test_g.create_formats_()
+    data = n_classes, train_g, val_g, test_g
+    #outfile=open('intermediate.out','a')
+    #outfile.write('\n'+str(mygraph.num_nodes())+' '+str(mygraph.num_edges())+' '+str(n_feats)+' ')
+    #outfile.close()
 
+    print(train_g)
+
+    train_nfeat = val_nfeat = test_nfeat = mygraph.ndata.pop('features')
+    train_labels = val_labels = test_labels = mygraph.ndata.pop('labels')
     test_nid = test_g.ndata.pop('test_mask',
         ~(test_g.ndata['train_mask'] | test_g.ndata['val_mask'])).nonzero().squeeze()
     train_nid = train_g.ndata.pop('train_mask').nonzero().squeeze()
@@ -257,10 +309,16 @@ if __name__ == '__main__':
                f"Must have GPUs to enable {args.data_device} feature storage."
         run(0, 0, args, ['cpu'], data)
     elif n_gpus == 1:
+        outfile=open('intermediate0.out','a')
+        outfile.write('\n'+str(mygraph.num_nodes())+' '+str(mygraph.num_edges())+' '+str(n_feats)+' ')
+        outfile.close()
         run(0, n_gpus, args, devices, data)
     else:
         procs = []
         for proc_id in range(n_gpus):
+            outfile=open('intermediate'+str(proc_id)+'.out','a')
+            outfile.write('\n'+str(mygraph.num_nodes())+' '+str(mygraph.num_edges())+' '+str(n_feats)+' ')
+            outfile.close()
             p = mp.Process(target=run, args=(proc_id, n_gpus, args, devices, data))
             p.start()
             procs.append(p)

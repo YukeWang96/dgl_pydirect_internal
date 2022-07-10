@@ -95,3 +95,4 @@ Requires `pytorch_lightning` and `torchmetrics`.
 python3 train_lightning.py
 python3 train_lightning_unsupervised.py
 ```
+# pytorch-direct-bench
