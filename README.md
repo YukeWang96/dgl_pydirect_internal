@@ -22,6 +22,10 @@ setup profile
 conda activate dgl
 cd ../
 python pytorchdirecttest.py
+```
+
+generate xls
+```
 cp *.out outfilefull/
 cd xls_generate
 python outtoxls.py
