@@ -1,0 +1,11 @@
+graph_name,num_gpu,memory(MB),memory_util(%)
+wiki-talk-temporal.mtx,4,2987.5,7.293701171875
+soc-LiveJournal1.mtx,4,6272.5,15.313720703125
+com-LiveJournal.mtx,4,5962.5,14.556884765625
+cit-Patents.mtx,4,4536.5,11.075439453125
+sx-stackoverflow.mtx,4,4292.0,10.478515625
+wiki-Talk.mtx,4,3333.5,8.138427734375
+roadNet-CA.mtx,4,3214.0,7.846679687499999
+wiki-topcats.mtx,4,4131.0,10.08544921875
+as-Skitter.mtx,4,3903.0,9.52880859375
+roadNet-TX.mtx,4,3034.0,7.407226562499999
