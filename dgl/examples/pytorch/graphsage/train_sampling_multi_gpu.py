@@ -177,14 +177,15 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
                 # Compute loss and prediction
                 #with th.no_grad():
                 print("modelstart")
-                batch_pred = model(blocks, batch_inputs)
+                agg_profile,batch_pred = model(blocks, batch_inputs)
                 print("modelend")
                 #print(agg_profile)
                 #print(batch_inputs.shape)
                 #print(batch_pred.shape)
             th.cuda.synchronize()
             end_agg=time.time()
-            agg=agg+end_agg-start_agg
+            #agg=agg+end_agg-start_agg
+            agg=agg+agg_profile
             #loss = loss_fcn(batch_pred, batch_labels)
             #optimizer.zero_grad()
             #loss.backward()
