@@ -1,4 +1,4 @@
-graph_name,num_node,num_edge,num_gpu,embedding_size,time(ms)
+graph_name,num_node,num_edge,num_gpu,embedding_size,time(s)
 wiki-talk-temporal,1140149,3309592,2,16,0.015004825592041016
 wiki-talk-temporal,1140149,3309592,2,32,0.022024917602539065
 wiki-talk-temporal,1140149,3309592,2,64,0.04036622047424316
