@@ -280,11 +280,11 @@ if __name__ == '__main__':
     n_gpus = len(devices)
     graph_path = args.source  + '_dgl_graph.bin'
 
-    spmat=scipy.io.mmread(args.source)
-    mygraph=dgl.from_scipy(spmat)
-    print(mygraph)
-    dgl.save_graphs(graph_path, mygraph)
-    exit(0)
+    # spmat=scipy.io.mmread(args.source)
+    # mygraph=dgl.from_scipy(spmat)
+    # print(mygraph)
+    # dgl.save_graphs(graph_path, mygraph)
+    # exit(0)
 
     mygraph,label_dict = dgl.load_graphs(graph_path)
     mygraph=mygraph[0]

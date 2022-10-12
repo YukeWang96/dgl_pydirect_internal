@@ -3,16 +3,15 @@ import xlwt
 
 def main():
 
-    itr=0
     mtx_path_list=[
 
     'graphdata/reddit.mtx',
-    # 'graphdata/enwiki-2013.mtx',
-    # 'graphdata/it-2004.mtx',
-    # 'graphdata/papers100m.mtx',
-    # 'graphdata/ogbn-products.mtx',
-    # 'graphdata/ogbn-proteins.mtx',
-    # 'graphdata/com-orkut.mtx',
+    'graphdata/enwiki-2013.mtx',
+    'graphdata/it-2004.mtx',
+    'graphdata/papers100m.mtx',
+    'graphdata/ogbn-products.mtx',
+    'graphdata/ogbn-proteins.mtx',
+    'graphdata/com-orkut.mtx',
 
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
