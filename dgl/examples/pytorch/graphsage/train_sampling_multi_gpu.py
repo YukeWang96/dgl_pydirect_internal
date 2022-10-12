@@ -170,27 +170,25 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
                 #print(th.cuda.memory_reserved(proc_id))
                 start_agg=time.time()
                 blocks = [block.int().to(device) for block in blocks]
-
-            
-
-
                 # Compute loss and prediction
                 #with th.no_grad():
                 print("modelstart")
-                agg_profile,batch_pred = model(blocks, batch_inputs)
+                batch_pred = model(blocks, batch_inputs)
                 print("modelend")
+                th.cuda.synchronize()
+                end_agg=time.time()
+                agg=agg+end_agg-start_agg
                 #print(agg_profile)
                 #print(batch_inputs.shape)
                 #print(batch_pred.shape)
-            th.cuda.synchronize()
-            end_agg=time.time()
+            # th.cuda.synchronize()
+            # end_agg=time.time()
             #agg=agg+end_agg-start_agg
-            agg=agg+agg_profile
+            # agg=agg+agg_profile
             #loss = loss_fcn(batch_pred, batch_labels)
             #optimizer.zero_grad()
             #loss.backward()
             #optimizer.step()
-            
 
             if proc_id == 0:
                 iter_tput.append(len(seeds) * n_gpus / (time.time() - tic_step))
@@ -241,8 +239,8 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         th.distributed.barrier()
     if proc_id == 0:
         #print('Avg epoch time: {}'.format(avg / (epoch - 4)))
-        print('Avg fetch time: {}'.format(avg_fetch / (3)))
-        print('Avg agg time: {}'.format(avg_agg / (3)))
+        print('Avg fetch time (ms): {:.3f}'.format(avg_fetch / (args.num_epochs - 1) * 1e3))
+        print('Avg agg time (ms): {:.3f}'.format(avg_agg / (args.num_epochs - 1) * 1e3))
     print("end")
 
 if __name__ == '__main__':
@@ -280,42 +278,19 @@ if __name__ == '__main__':
 
     devices = list(map(int, args.gpu.split(',')))
     n_gpus = len(devices)
-    '''
-    if args.dataset == 'reddit':
-        g, n_classes = load_reddit()
-    elif args.dataset == 'ogbn-products':
-        g, n_classes = load_ogb('ogbn-products')
-    elif args.dataset == 'ogbn-papers100M':
-        g, n_classes = load_ogb('ogbn-papers100M')
-        g = dgl.add_reverse_edges(g)
-        # convert labels to integer
-        g.ndata['labels'] = th.as_tensor(g.ndata['labels'], dtype=th.int64)
-        g.ndata.pop('year')
-    else:
-        raise Exception('unknown dataset')
-    
-    if args.inductive:
-        train_g, val_g, test_g = inductive_split(g)
-        train_nfeat = train_g.ndata.pop('features')
-        val_nfeat = val_g.ndata.pop('features')
-        test_nfeat = test_g.ndata.pop('features')
-        train_labels = train_g.ndata.pop('labels')
-        val_labels = val_g.ndata.pop('labels')
-        test_labels = test_g.ndata.pop('labels')
-    else:
-        train_g = val_g = test_g = g
-        train_nfeat = val_nfeat = test_nfeat = g.ndata.pop('features')
-        train_labels = val_labels = test_labels = g.ndata.pop('labels')
-    '''
-    #spmat=scipy.io.mmread(args.source)
-    #mygraph=dgl.from_scipy(spmat)
-    #print(mygraph)
     graph_path = args.source  + '_dgl_graph.bin'
-    #dgl.save_graphs(graph_path, mygraph)
+
+    spmat=scipy.io.mmread(args.source)
+    mygraph=dgl.from_scipy(spmat)
+    print(mygraph)
+    dgl.save_graphs(graph_path, mygraph)
+    exit(0)
+
     mygraph,label_dict = dgl.load_graphs(graph_path)
     mygraph=mygraph[0]
     print(mygraph)
-    #exit()
+
+
     n_feats=args.nfeats
     n_classes=7
     f_tensor=th.randn(mygraph.num_nodes(),n_feats)
@@ -341,7 +316,6 @@ if __name__ == '__main__':
     #outfile=open('intermediate.out','a')
     #outfile.write('\n'+str(mygraph.num_nodes())+' '+str(mygraph.num_edges())+' '+str(n_feats)+' ')
     #outfile.close()
-
     print(train_g)
 
     train_nfeat = val_nfeat = test_nfeat = mygraph.ndata.pop('features')

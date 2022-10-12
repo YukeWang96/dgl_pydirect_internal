@@ -29,13 +29,12 @@ class SAGE(nn.Module):
 
     def forward(self, blocks, x):
         h = x
-        t=0
         for l, (layer, block) in enumerate(zip(self.layers, blocks)):
-            t,h = layer(block, h)
+            h = layer(block, h)
             #if l != len(self.layers) - 1:
             #    h = self.activation(h)
             #    h = self.dropout(h)
-        return t,h
+        return h
 
     def inference(self, g, x, device, batch_size, num_workers):
         """

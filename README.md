@@ -5,10 +5,16 @@ If you want to profile, the instructions are needed:
 
 setup docker
 ```
-docker push zqj2333/pytorch-direct:v4
-docker run --name profile --gpus=all --shm-size="32g" -itd zqj2333/pytorch-direct:v4
-docker exec -it profile /bin/bash
+docker pull happy233/glcc_pytorch_direct:new
+docker run -it -v $(pwd):/pytorch-direct --gpus=all --shm-size="32g" happy233/glcc_pytorch_direct:new /bin/bash
+docker run -it -v $(pwd):/pytorch-direct --gpus=all happy233/glcc_pytorch_direct:new /bin/bash
+
 ```
+
+<!-- docker run -it --gpus=all --shm-size="32g" happy233/glcc_pytorch_direct:base /bin/bash -->
+<!-- docker pull zqj2333/pytorch-direct:v4 -->
+<!-- docker exec -it profile /bin/bash -->
+<!-- docker run  -it --gpus=all --shm-size="32g" -itd zqj2333/pytorch-direct:v4  /bin/bash -->
 
 get graph dataset
 ```
