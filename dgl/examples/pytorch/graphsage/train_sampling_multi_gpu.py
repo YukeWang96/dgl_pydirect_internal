@@ -290,7 +290,6 @@ if __name__ == '__main__':
     mygraph=mygraph[0]
     print(mygraph)
 
-
     n_feats=args.nfeats
     n_classes=7
     f_tensor=th.randn(mygraph.num_nodes(),n_feats)

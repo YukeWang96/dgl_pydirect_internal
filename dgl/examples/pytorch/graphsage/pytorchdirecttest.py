@@ -5,13 +5,13 @@ def main():
 
     mtx_path_list=[
 
-    'graphdata/reddit.mtx',
-    'graphdata/enwiki-2013.mtx',
-    'graphdata/it-2004.mtx',
+    # 'graphdata/reddit.mtx',
+    # 'graphdata/enwiki-2013.mtx',
+    # 'graphdata/it-2004.mtx',
     'graphdata/papers100m.mtx',
-    'graphdata/ogbn-products.mtx',
-    'graphdata/ogbn-proteins.mtx',
-    'graphdata/com-orkut.mtx',
+    # 'graphdata/ogbn-products.mtx',
+    # 'graphdata/ogbn-proteins.mtx',
+    # 'graphdata/com-orkut.mtx',
 
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
@@ -34,9 +34,9 @@ def main():
     gpuinst='0'
     # gpu_list=[2,4,8]
     # embedding_size=[16,32,64,128,256]
-    # gpu_list=[4]
-    gpu_list = [1]
-    embedding_size=[64]
+    gpu_list=[4]
+    # gpu_list = [1]
+    embedding_size=[16]
     
     for n in range(1):
         ngpu=gpu_list[n]

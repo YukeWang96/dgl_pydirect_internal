@@ -7,7 +7,7 @@ setup docker
 ```
 docker pull happy233/glcc_pytorch_direct:new
 docker run -it -v $(pwd):/pytorch-direct --gpus=all --shm-size="32g" happy233/glcc_pytorch_direct:new /bin/bash
-docker run -it -v $(pwd):/pytorch-direct -v /data/datasets/graphs/osdi23_mgg:/pytorch-direct/graphdata --gpus=all happy233/glcc_pytorch_direct:new /bin/bash
+docker run -it -v $(pwd):/pytorch-direct -v /data/datasets/graphs/osdi23_mgg:/pytorch-direct/graphdata --gpus=all --shm-size="256g" happy233/glcc_pytorch_direct:new /bin/bash
 
 ```
 
