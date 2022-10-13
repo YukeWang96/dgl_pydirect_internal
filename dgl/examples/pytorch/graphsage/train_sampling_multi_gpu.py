@@ -1,21 +1,22 @@
 import os
 import dgl
-# import numpy as np
 import torch as th
-# import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 import dgl.multiprocessing as mp
-# import dgl.nn.pytorch as dglnn
 import time
-# import math
 import argparse
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
+from model import SAGE
+
+# import numpy as np
+# import torch.nn as nn
+# import torch.optim as optim
+# import dgl.nn.pytorch as dglnn
+# import math
 # import scipy
 #from pytorch_memlab import MemReporter
 #from pytorch_memlab import profile, set_target_gpu
-from model import SAGE
 # from load_graph import load_reddit, inductive_split, load_ogb
 import warnings
 warnings.filterwarnings("ignore")
