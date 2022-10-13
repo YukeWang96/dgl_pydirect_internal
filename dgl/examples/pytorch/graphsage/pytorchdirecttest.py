@@ -5,13 +5,13 @@ def main():
 
     mtx_path_list=[
 
-    # 'graphdata/reddit.mtx',
-    # 'graphdata/enwiki-2013.mtx',
-    # 'graphdata/it-2004.mtx',
+    'graphdata/reddit.mtx',
+    'graphdata/enwiki-2013.mtx',
+    'graphdata/it-2004.mtx',
     'graphdata/papers100m.mtx',
-    # 'graphdata/ogbn-products.mtx',
-    # 'graphdata/ogbn-proteins.mtx',
-    # 'graphdata/com-orkut.mtx',
+    'graphdata/ogbn-products.mtx',
+    'graphdata/ogbn-proteins.mtx',
+    'graphdata/com-orkut.mtx',
 
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
@@ -66,7 +66,7 @@ def main():
                     writefile.write(str(ngpu)+' '+str(j)+' '+str(embed)+' ')
                     myline=myfile.readline()
                     myline=myfile.readline()
-                    print('content')
+                    # print('content')
                     print(myline)
                     writefile.write(myline)
                     writefile.write('\n')

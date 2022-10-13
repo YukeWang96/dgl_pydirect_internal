@@ -1,3 +1,5 @@
+from audioop import bias
+from tkinter.tix import Tree
 import torch as th
 import torch.nn as nn
 import torch.functional as F
@@ -17,15 +19,16 @@ class SAGE(nn.Module):
         self.n_hidden = n_hidden
         self.n_classes = n_classes
         self.layers = nn.ModuleList()
-        if n_layers > 1:
-            self.layers.append(dglnn.SAGEConv(in_feats, n_hidden, 'mean'))
-            for i in range(1, n_layers - 1):
-                self.layers.append(dglnn.SAGEConv(n_hidden, n_hidden, 'mean'))
-            self.layers.append(dglnn.SAGEConv(n_hidden, n_classes, 'mean'))
-        else:
-            self.layers.append(dglnn.SAGEConv(in_feats, n_classes, 'mean'))
-        self.dropout = nn.Dropout(dropout)
-        self.activation = activation
+        self.layers.append(dglnn.pytorch.conv.GraphConv(in_feats, n_hidden, norm='none', bias=False, allow_zero_in_degree=True))
+        # if n_layers > 1:
+        #     self.layers.append(dglnn.SAGEConv(in_feats, n_hidden, 'mean'))
+        #     for i in range(1, n_layers - 1):
+        #         self.layers.append(dglnn.SAGEConv(n_hidden, n_hidden, 'mean'))
+        #     self.layers.append(dglnn.SAGEConv(n_hidden, n_classes, 'mean'))
+        # else:
+        #     self.layers.append(dglnn.SAGEConv(in_feats, n_classes, 'mean'))
+        # self.dropout = nn.Dropout(dropout)
+        # self.activation = activation
 
     def forward(self, blocks, x):
         h = x

@@ -1,22 +1,24 @@
 import os
 import dgl
-import numpy as np
+# import numpy as np
 import torch as th
-import torch.nn as nn
+# import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import dgl.multiprocessing as mp
-import dgl.nn.pytorch as dglnn
+# import dgl.nn.pytorch as dglnn
 import time
-import math
+# import math
 import argparse
 from torch.nn.parallel import DistributedDataParallel
-import tqdm
-import scipy
+from tqdm import tqdm
+# import scipy
 #from pytorch_memlab import MemReporter
 #from pytorch_memlab import profile, set_target_gpu
 from model import SAGE
-from load_graph import load_reddit, inductive_split, load_ogb
+# from load_graph import load_reddit, inductive_split, load_ogb
+import warnings
+warnings.filterwarnings("ignore")
 
 def compute_acc(pred, labels):
     """
@@ -112,8 +114,8 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
     model = model.to(device)
     if n_gpus > 1:
         model = DistributedDataParallel(model, device_ids=[device], output_device=device)
-    loss_fcn = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    # loss_fcn = nn.CrossEntropyLoss()
+    # optimizer = optim.Adam(model.parameters(), lr=args.lr)
     #if proc_id==0:
     #    print("memory")
     #    print(th.cuda.memory_allocated(proc_id))
@@ -123,22 +125,21 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
     avg_fetch=0
     avg_agg=0
     iter_tput = []
-    for epoch in range(args.num_epochs):
-        if proc_id==0:
-            print(epoch)
-        tic = time.time()
+    for epoch in tqdm(range(args.num_epochs)):
+        # if proc_id==0:
+            # print(str(epoch), end=" ")
         fetch=0
         agg=0
         # Loop over the dataloader to sample the computation dependency graph as a list of
         # blocks.
         #reporter = MemReporter()
         #reporter.report()
-        if proc_id==0:
-            print("ready to dataloader")
+        # if proc_id==0:
+        #     print("ready to dataloader")
         for step, (input_nodes, seeds, blocks) in enumerate(dataloader):
-            if proc_id==0:
-                print("dataloader success")
-            print(blocks[0])
+            # if proc_id==0:
+            #     print("dataloader success")
+            # print(blocks[0])
             #reporter = MemReporter()
             #reporter.report()
             if proc_id == 0:
@@ -150,7 +151,10 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
             #print(input_nodes.shape)
             # Load the input features as well as output labels
             #with th.no_grad():
+
+            blocks = [block.int().to(device) for block in blocks] # move graph structure.
             th.cuda.synchronize()
+
             start_fetch=time.time()
             #reporter = MemReporter()
             #reporter.report()
@@ -159,22 +163,22 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
                                                         seeds, input_nodes, device)
              
                 th.cuda.synchronize()
-                print(batch_inputs.shape)
-                #reporter = MemReporter()
-                #reporter.report()
                 end_fetch=time.time()
                 fetch=fetch+end_fetch-start_fetch
+                # print("batch_inputs: ", batch_inputs)
+                # print("blocks: ", blocks)
+                #reporter = MemReporter()
+                #reporter.report()
                 #th.cuda.empty_cache()
                 #print("memory1")
                 #print(th.cuda.memory_allocated(proc_id))
                 #print(th.cuda.memory_reserved(proc_id))
                 start_agg=time.time()
-                blocks = [block.int().to(device) for block in blocks]
                 # Compute loss and prediction
                 #with th.no_grad():
-                print("modelstart")
+                # print("modelstart")
                 batch_pred = model(blocks, batch_inputs)
-                print("modelend")
+                # print("modelend")
                 th.cuda.synchronize()
                 end_agg=time.time()
                 agg=agg+end_agg-start_agg
@@ -199,41 +203,21 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         if epoch>=1:
             avg_fetch=avg_fetch+fetch
             avg_agg=avg_agg+agg
-        print("inter end")
+        # print("inter end")
         #reporter = MemReporter()
         #reporter.report()
         if n_gpus > 1:
             th.distributed.barrier()
 
         toc = time.time()
-        #outfile=open('intermediate'+str(proc_id)+'.out','a')
-        #outfile.write(str(toc-tic)+' '+str(fetch))
-        #if proc_id == 0:
-            #print('Epoch Time(s): {:.4f}'.format(toc - tic))
-            #print('Fetch Time(s): {:.4f}'.format(fetch))
-        #if epoch >= 5:
-        #    avg += toc - tic
-        '''if epoch % args.eval_every == 0 and epoch != 0:
-                if n_gpus == 1:
-                    eval_acc = evaluate(
-                        model, val_g, val_nfeat, val_labels, val_nid, devices[0])
-                    test_acc = evaluate(
-                        model, test_g, test_nfeat, test_labels, test_nid, devices[0])
-                else:
-                    eval_acc = evaluate(
-                        model.module, val_g, val_nfeat, val_labels, val_nid, devices[0])
-                    test_acc = evaluate(
-                        model.module, test_g, test_nfeat, test_labels, test_nid, devices[0])
-                print('Eval Acc {:.4f}'.format(eval_acc))
-                print('Test Acc: {:.4f}'.format(test_acc))
-        '''
-    print('intermediate'+str(proc_id)+'.out')
+
+    # print()
+    # print('intermediate'+str(proc_id)+'.out')
     #print(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
     outfile=open('intermediate'+str(proc_id)+'.out','a')
     #outfile.write(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
-    outfile.write(str(avg_fetch / (3)))
-    outfile.write(' ')
-    outfile.write(str(avg_agg / (3)))
+    outfile.write(str("{:.3f}".format(avg_fetch / (args.num_epochs - 1) * 1e3)) + " ")
+    outfile.write(str("{:.3f}".format(avg_agg / (args.num_epochs - 1) * 1e3)))
     outfile.close()
     if n_gpus > 1:
         th.distributed.barrier()
@@ -241,7 +225,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         #print('Avg epoch time: {}'.format(avg / (epoch - 4)))
         print('Avg fetch time (ms): {:.3f}'.format(avg_fetch / (args.num_epochs - 1) * 1e3))
         print('Avg agg time (ms): {:.3f}'.format(avg_agg / (args.num_epochs - 1) * 1e3))
-    print("end")
+    # print("end")
 
 if __name__ == '__main__':
     #th.multiprocessing.set_start_method('spawn')
@@ -249,7 +233,7 @@ if __name__ == '__main__':
     argparser.add_argument('--gpu', type=str, default='0',
                            help="Comma separated list of GPU device IDs.")
     argparser.add_argument('--dataset', type=str, default='reddit')
-    argparser.add_argument('--num-epochs', type=int, default=4)
+    argparser.add_argument('--num-epochs', type=int, default=10)
     argparser.add_argument('--num-hidden', type=int, default=16)
     argparser.add_argument('--num-layers', type=int, default=1)
     argparser.add_argument('--fan-out', type=str, default='10,25')
@@ -273,7 +257,7 @@ if __name__ == '__main__':
                                 "'uva' to enable UnifiedTensor (GPU zero-copy access on "
                                 "pinned host memory).")
     argparser.add_argument('--source', type=str, default='error')
-    argparser.add_argument('--nfeats', type=int, default=256)
+    argparser.add_argument('--nfeats', type=int, default=16)
     args = argparser.parse_args()
 
     devices = list(map(int, args.gpu.split(',')))
@@ -288,10 +272,10 @@ if __name__ == '__main__':
 
     mygraph,label_dict = dgl.load_graphs(graph_path)
     mygraph=mygraph[0]
-    print(mygraph)
+    # print(mygraph)
 
     n_feats=args.nfeats
-    n_classes=7
+    n_classes=args.num_hidden
     f_tensor=th.randn(mygraph.num_nodes(),n_feats)
     l_tensor=th.randint(0,7,(mygraph.num_nodes(),))
     l_tensor=l_tensor.type(th.int64)
@@ -315,7 +299,7 @@ if __name__ == '__main__':
     #outfile=open('intermediate.out','a')
     #outfile.write('\n'+str(mygraph.num_nodes())+' '+str(mygraph.num_edges())+' '+str(n_feats)+' ')
     #outfile.close()
-    print(train_g)
+    # print(train_g)
 
     train_nfeat = val_nfeat = test_nfeat = mygraph.ndata.pop('features')
     train_labels = val_labels = test_labels = mygraph.ndata.pop('labels')
@@ -347,7 +331,8 @@ if __name__ == '__main__':
     data = n_classes, train_g, val_g, test_g, train_nfeat, val_nfeat, test_nfeat, \
            train_labels, val_labels, test_labels, train_nid, val_nid, test_nid
     my_batch_size=int(int(mygraph.num_nodes())/int(n_gpus))+1
-    print(my_batch_size)
+    # print(my_batch_size)
+
     #print("memory")
     #print(th.cuda.memory_reserved(0))
     #print(th.cuda.memory_allocated(0))
