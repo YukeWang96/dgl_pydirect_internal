@@ -223,8 +223,11 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         th.distributed.barrier()
     if proc_id == 0:
         #print('Avg epoch time: {}'.format(avg / (epoch - 4)))
-        print('Avg fetch time (ms): {:.3f}'.format(avg_fetch / (args.num_epochs - 1) * 1e3))
-        print('Avg agg time (ms): {:.3f}'.format(avg_agg / (args.num_epochs - 1) * 1e3))
+        fetch_avg = avg_fetch / (args.num_epochs - 1) * 1e3
+        agg_avg = avg_agg / (args.num_epochs - 1) * 1e3
+        print('Fetch (ms):\t{:.3f}'.format(fetch_avg))
+        print('Aggre (ms):\t{:.3f}'.format(agg_avg))
+        print('Total (ms):\t{:.3f}'.format(fetch_avg + agg_avg))
     # print("end")
 
 if __name__ == '__main__':

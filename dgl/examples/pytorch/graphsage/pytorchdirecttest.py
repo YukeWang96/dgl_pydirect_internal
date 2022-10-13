@@ -34,7 +34,7 @@ def main():
     gpuinst='0'
     # gpu_list=[2,4,8]
     # embedding_size=[16,32,64,128,256]
-    gpu_list=[4]
+    gpu_list=[8]
     # gpu_list = [1]
     embedding_size=[16]
     
