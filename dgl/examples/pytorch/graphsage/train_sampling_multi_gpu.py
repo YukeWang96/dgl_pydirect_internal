@@ -211,11 +211,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
             th.distributed.barrier()
         toc = time.time()
 
-    # print()
-    # print('intermediate'+str(proc_id)+'.out')
-    #print(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
     outfile=open('intermediate'+str(proc_id)+'.out','a')
-    #outfile.write(str(avg / (epoch - 4))+' '+str(avg_fetch / (epoch)))
     outfile.write(str("{:.3f}".format(avg_fetch / (args.num_epochs - 1) * 1e3)) + " ")
     outfile.write(str("{:.3f}".format(avg_agg / (args.num_epochs - 1) * 1e3)))
     outfile.close()
@@ -236,7 +232,7 @@ if __name__ == '__main__':
     argparser.add_argument('--gpu', type=str, default='0',
                            help="Comma separated list of GPU device IDs.")
     argparser.add_argument('--dataset', type=str, default='reddit')
-    argparser.add_argument('--num-epochs', type=int, default=10)
+    argparser.add_argument('--num-epochs', type=int, default=3)
     argparser.add_argument('--num-hidden', type=int, default=16)
     argparser.add_argument('--num-layers', type=int, default=1)
     argparser.add_argument('--fan-out', type=str, default='10,25')
