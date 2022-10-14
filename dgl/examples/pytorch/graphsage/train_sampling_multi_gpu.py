@@ -164,8 +164,8 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
                                                         seeds, input_nodes, device)
              
                 th.cuda.synchronize()
-                end_fetch=time.time()
-                fetch=fetch+end_fetch-start_fetch
+                end_fetch = time.time()
+                fetch=fetch + end_fetch - start_fetch
                 # print("batch_inputs: ", batch_inputs)
                 # print("blocks: ", blocks)
                 #reporter = MemReporter()
@@ -174,15 +174,15 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
                 #print("memory1")
                 #print(th.cuda.memory_allocated(proc_id))
                 #print(th.cuda.memory_reserved(proc_id))
-                start_agg=time.time()
+                start_agg = time.time()
                 # Compute loss and prediction
                 #with th.no_grad():
                 # print("modelstart")
                 batch_pred = model(blocks, batch_inputs)
                 # print("modelend")
                 th.cuda.synchronize()
-                end_agg=time.time()
-                agg=agg+end_agg-start_agg
+                end_agg = time.time()
+                agg = agg + end_agg - start_agg
                 #print(agg_profile)
                 #print(batch_inputs.shape)
                 #print(batch_pred.shape)
@@ -209,7 +209,6 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         #reporter.report()
         if n_gpus > 1:
             th.distributed.barrier()
-
         toc = time.time()
 
     # print()
@@ -281,12 +280,15 @@ if __name__ == '__main__':
     n_feats=args.nfeats
     n_classes=args.num_hidden
     f_tensor=th.randn(mygraph.num_nodes(),n_feats)
+
     l_tensor=th.randint(0,7,(mygraph.num_nodes(),))
     l_tensor=l_tensor.type(th.int64)
-    testmask=th.zeros(mygraph.num_nodes())
+    
+    testmask=th.ones(mygraph.num_nodes())
     testmask=testmask.type(th.bool)
     trainmask=th.ones(mygraph.num_nodes())
     trainmask=trainmask.type(th.bool)
+
     mygraph.ndata['label']=l_tensor
     mygraph.ndata['feat']=f_tensor
     mygraph.ndata['test_mask']=testmask
@@ -294,16 +296,13 @@ if __name__ == '__main__':
     mygraph.ndata['val_mask']=testmask
     mygraph.ndata['features']=f_tensor
     mygraph.ndata['labels']=l_tensor
+
     mygraph = dgl.as_heterograph(mygraph)
     train_g = val_g = test_g = mygraph
     train_g.create_formats_()
     val_g.create_formats_()
     test_g.create_formats_()
     data = n_classes, train_g, val_g, test_g
-    #outfile=open('intermediate.out','a')
-    #outfile.write('\n'+str(mygraph.num_nodes())+' '+str(mygraph.num_edges())+' '+str(n_feats)+' ')
-    #outfile.close()
-    # print(train_g)
 
     train_nfeat = val_nfeat = test_nfeat = mygraph.ndata.pop('features')
     train_labels = val_labels = test_labels = mygraph.ndata.pop('labels')
@@ -334,9 +333,9 @@ if __name__ == '__main__':
     # Pack data
     data = n_classes, train_g, val_g, test_g, train_nfeat, val_nfeat, test_nfeat, \
            train_labels, val_labels, test_labels, train_nid, val_nid, test_nid
-    my_batch_size=int(int(mygraph.num_nodes())/int(n_gpus))+1
+    # my_batch_size=int(int(mygraph.num_nodes())/int(n_gpus))+1
+    my_batch_size = int((mygraph.num_nodes()  + n_gpus - 1)/n_gpus)
     # print(my_batch_size)
-
     #print("memory")
     #print(th.cuda.memory_reserved(0))
     #print(th.cuda.memory_allocated(0))

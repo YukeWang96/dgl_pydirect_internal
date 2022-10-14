@@ -5,10 +5,10 @@ def main():
 
     mtx_path_list=[
 
-    # 'graphdata/reddit.mtx',
-    # 'graphdata/enwiki-2013.mtx',
+    'graphdata/reddit.mtx',
+    'graphdata/enwiki-2013.mtx',
     # 'graphdata/it-2004.mtx',
-    'graphdata/papers100m.mtx',
+    # 'graphdata/papers100m.mtx',
     # 'graphdata/ogbn-products.mtx',
     # 'graphdata/ogbn-proteins.mtx',
     # 'graphdata/com-orkut.mtx',
