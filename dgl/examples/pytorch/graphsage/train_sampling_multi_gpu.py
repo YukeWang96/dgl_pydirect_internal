@@ -8,6 +8,7 @@ import argparse
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 from model import SAGE
+import statistics
 
 # import numpy as np
 # import torch.nn as nn
@@ -126,11 +127,12 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
     avg_fetch=0
     avg_agg=0
     iter_tput = []
+    iter_time = []
     for epoch in tqdm(range(args.num_epochs)):
         # if proc_id==0:
             # print(str(epoch), end=" ")
-        fetch=0
-        agg=0
+        fetch = 0
+        agg = 0
         # Loop over the dataloader to sample the computation dependency graph as a list of
         # blocks.
         #reporter = MemReporter()
@@ -143,6 +145,9 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
             # print(blocks[0])
             #reporter = MemReporter()
             #reporter.report()
+            blocks = [block.int().to(device) for block in blocks] # move graph structure.
+            
+            th.distributed.barrier()
             if proc_id == 0:
                 th.cuda.synchronize()
                 #print("memory")
@@ -153,7 +158,6 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
             # Load the input features as well as output labels
             #with th.no_grad():
 
-            blocks = [block.int().to(device) for block in blocks] # move graph structure.
             th.cuda.synchronize()
 
             start_fetch=time.time()
@@ -194,16 +198,21 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
             #optimizer.zero_grad()
             #loss.backward()
             #optimizer.step()
-
+            
+            th.distributed.barrier()
             if proc_id == 0:
-                iter_tput.append(len(seeds) * n_gpus / (time.time() - tic_step))
+                dur = time.time() - tic_step
+                iter_tput.append(len(seeds) * n_gpus / (dur))
+                iter_time.append(dur)
             #if step % args.log_every == 0 and proc_id == 0:
                # acc = compute_acc(batch_pred, batch_labels)
                 #print('Epoch {:05d} | Step {:05d} | Loss {:.4f} | Train Acc {:.4f} | Speed (samples/sec) {:.4f} | GPU {:.1f} MB'.format(
                  #   epoch, step, loss.item(), acc.item(), np.mean(iter_tput[3:]), th.cuda.max_memory_allocated() / 1000000))
-        if epoch>=1:
-            avg_fetch=avg_fetch+fetch
-            avg_agg=avg_agg+agg
+            break
+
+        if epoch >= 1:
+            avg_fetch = avg_fetch + fetch
+            avg_agg = avg_agg + agg
         # print("inter end")
         #reporter = MemReporter()
         #reporter.report()
@@ -224,6 +233,11 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         print('Fetch (ms):\t{:.3f}'.format(fetch_avg))
         print('Aggre (ms):\t{:.3f}'.format(agg_avg))
         print('Total (ms):\t{:.3f}'.format(fetch_avg + agg_avg))
+        print('Avg Iter (ms):\t{:.3f}'.format(sum(iter_time)/len(iter_time)*1e3))
+        print('MIN Iter (ms):\t{:.3f}'.format(min(iter_time)*1e3))
+        print('MED Iter (ms):\t{:.3f}'.format(statistics.median(iter_time)*1e3))
+        print('MAX Iter (ms):\t{:.3f}'.format(max(iter_time)*1e3))
+        print([i*1e3 for i in iter_time])
     # print("end")
 
 if __name__ == '__main__':
@@ -232,7 +246,7 @@ if __name__ == '__main__':
     argparser.add_argument('--gpu', type=str, default='0',
                            help="Comma separated list of GPU device IDs.")
     argparser.add_argument('--dataset', type=str, default='reddit')
-    argparser.add_argument('--num-epochs', type=int, default=3)
+    argparser.add_argument('--num-epochs', type=int, default=10)
     argparser.add_argument('--num-hidden', type=int, default=16)
     argparser.add_argument('--num-layers', type=int, default=1)
     argparser.add_argument('--fan-out', type=str, default='10,25')
@@ -330,8 +344,12 @@ if __name__ == '__main__':
     data = n_classes, train_g, val_g, test_g, train_nfeat, val_nfeat, test_nfeat, \
            train_labels, val_labels, test_labels, train_nid, val_nid, test_nid
     # my_batch_size=int(int(mygraph.num_nodes())/int(n_gpus))+1
-    my_batch_size = int((mygraph.num_nodes()  + n_gpus - 1)/n_gpus)
-    # print(my_batch_size)
+
+    # my_batch_size = int((mygraph.num_nodes()  + n_gpus - 1)/n_gpus)
+    my_batch_size = int(int((mygraph.num_nodes()  + n_gpus - 1)/n_gpus) / 10 * 8)
+    # my_batch_size = 1000
+    print("my_batch_size: ", my_batch_size)
+    
     #print("memory")
     #print(th.cuda.memory_reserved(0))
     #print(th.cuda.memory_allocated(0))

@@ -4,14 +4,13 @@ import xlwt
 def main():
 
     mtx_path_list=[
-
     'graphdata/reddit.mtx',
-    'graphdata/enwiki-2013.mtx',
-    'graphdata/it-2004.mtx',
-    'graphdata/papers100m.mtx',
-    'graphdata/ogbn-products.mtx',
-    'graphdata/ogbn-proteins.mtx',
-    'graphdata/com-orkut.mtx',
+    # 'graphdata/enwiki-2013.mtx',
+    # 'graphdata/it-2004.mtx',
+    # 'graphdata/papers100m.mtx',
+    # 'graphdata/ogbn-products.mtx',
+    # 'graphdata/ogbn-proteins.mtx',
+    # 'graphdata/com-orkut.mtx',
 
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
     # 'graphdata/snap/email-Eu-core/email-Eu-core.mtx',
@@ -34,9 +33,11 @@ def main():
     gpuinst='0'
     # gpu_list=[2,4,8]
     # embedding_size=[16,32,64,128,256]
-    gpu_list=[8]
+    # gpu_list=[8]
+    gpu_list = [4]
     # gpu_list = [1]
     embedding_size=[16]
+    # embedding_size=[32]
     
     for n in range(1):
         ngpu=gpu_list[n]
@@ -53,8 +54,10 @@ def main():
                 for j in range(ngpu):
                     os.system('touch intermediate'+str(j)+'.out')
                 
+                # profile = "/opt/nvidia/nsight-compute/2022.3.0/ncu --metrics all --devices 0 "
                 command='python train_sampling_multi_gpu.py --gpu '+gpuinst+' --graph-device cpu --data-device uva --source '+source+' --nfeats '+str(embed)
-                print(command)
+                # print(command)
+                # command = profile + command
                 os.system(command)
 
                 writefile=open(str(i+1)+'.out','a')
