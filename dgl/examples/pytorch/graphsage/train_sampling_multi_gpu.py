@@ -9,16 +9,6 @@ from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 from model import SAGE
 import statistics
-
-# import numpy as np
-# import torch.nn as nn
-# import torch.optim as optim
-# import dgl.nn.pytorch as dglnn
-# import math
-# import scipy
-#from pytorch_memlab import MemReporter
-#from pytorch_memlab import profile, set_target_gpu
-# from load_graph import load_reddit, inductive_split, load_ogb
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -224,6 +214,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
     outfile.write(str("{:.3f}".format(avg_fetch / (args.num_epochs - 1) * 1e3)) + " ")
     outfile.write(str("{:.3f}".format(avg_agg / (args.num_epochs - 1) * 1e3)))
     outfile.close()
+
     if n_gpus > 1:
         th.distributed.barrier()
     if proc_id == 0:
@@ -238,7 +229,6 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         print('MED Iter (ms):\t{:.3f}'.format(statistics.median(iter_time)*1e3))
         print('MAX Iter (ms):\t{:.3f}'.format(max(iter_time)*1e3))
         print([i*1e3 for i in iter_time])
-    # print("end")
 
 if __name__ == '__main__':
     #th.multiprocessing.set_start_method('spawn')
@@ -276,16 +266,8 @@ if __name__ == '__main__':
     devices = list(map(int, args.gpu.split(',')))
     n_gpus = len(devices)
     graph_path = args.source  + '_dgl_graph.bin'
-
-    # spmat=scipy.io.mmread(args.source)
-    # mygraph=dgl.from_scipy(spmat)
-    # print(mygraph)
-    # dgl.save_graphs(graph_path, mygraph)
-    # exit(0)
-
     mygraph,label_dict = dgl.load_graphs(graph_path)
     mygraph=mygraph[0]
-    # print(mygraph)
 
     n_feats=args.nfeats
     n_classes=args.num_hidden
