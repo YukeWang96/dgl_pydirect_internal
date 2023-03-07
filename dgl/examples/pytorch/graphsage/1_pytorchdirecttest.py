@@ -3,22 +3,26 @@ import xlwt
 
 def main():
 
-    mtx_path_list=[
-        'graphdata/reddit.mtx',
-        'graphdata/enwiki-2013.mtx',
-        'graphdata/it-2004.mtx',
-        'graphdata/papers100m.mtx',
-        # 'graphdata/ogbn-products.mtx',
-        # 'graphdata/ogbn-proteins.mtx',
-        # 'graphdata/com-orkut.mtx'
-    ]
-
     # gpu_list=[2,4,8]
     # embedding_size=[16,32,64,128,256]
 
     gpu_list = [8]
     embedding_size=[16]
-    
+
+    mtx_path_list=[
+        'graphdata/enwiki-2013.mtx',
+        # 'graphdata/papers100m.mtx',
+        # 'graphdata/mag240m.mtx',
+        # 'graphdata/twitter7.mtx',
+        # 'graphdata/uk-2006-05.mtx',
+
+        # 'graphdata/it-2004.mtx',
+        # 'graphdata/reddit.mtx',
+        # 'graphdata/ogbn-products.mtx',
+        # 'graphdata/ogbn-proteins.mtx',
+        # 'graphdata/com-orkut.mtx'
+    ]
+
     for n in range(len(gpu_list)):
         ngpu=gpu_list[n]
         gpuinst='0'
@@ -37,7 +41,7 @@ def main():
                 command='python train_sampling_multi_gpu.py --gpu '+gpuinst+' --graph-device cpu --data-device uva --source '+source+' --nfeats '+str(embed)
                 # command = profile + command
 
-                # print(command)
+                print(command)
                 os.system(command)
 
                 writefile=open(str(i+1)+'.out','a')

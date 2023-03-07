@@ -7,7 +7,7 @@ import time
 import argparse
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
-from model import SAGE
+from model import SAGE, AGNN
 import statistics
 import warnings
 warnings.filterwarnings("ignore")
@@ -86,7 +86,8 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         args.num_workers = 0
 
     # Create PyTorch DataLoader for constructing blocks
-    sampler = dgl.dataloading.MultiLayerFullNeighborSampler(1)
+    # sampler = dgl.dataloading.MultiLayerFullNeighborSampler(1)
+    sampler = dgl.dataloading.NeighborSampler([5])
     dataloader = dgl.dataloading.NodeDataLoader(
         train_g,
         train_nid,
@@ -101,7 +102,10 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         )
 
     # Define model and optimizer
-    model = SAGE(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
+    # model = SAGE(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
+    model = AGNN(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
+
+
     #model=nn.Linear(4,2,True)
     model = model.to(device)
     if n_gpus > 1:

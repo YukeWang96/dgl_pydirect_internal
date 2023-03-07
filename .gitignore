@@ -165,3 +165,4 @@ config.cmake
 *.out
 *graphdata*
 *.out
+*.csv
