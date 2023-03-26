@@ -10,17 +10,17 @@ def main():
     embedding_size=[16]
 
     mtx_path_list=[
-        'graphdata/enwiki-2013.mtx',
-        # 'graphdata/papers100m.mtx',
-        # 'graphdata/mag240m.mtx',
-        # 'graphdata/twitter7.mtx',
-        # 'graphdata/uk-2006-05.mtx',
-
-        # 'graphdata/it-2004.mtx',
         # 'graphdata/reddit.mtx',
+        # 'graphdata/enwiki-2013.mtx',
+        # 'graphdata/it-2004.mtx',
+        'graphdata/papers100m.mtx',
         # 'graphdata/ogbn-products.mtx',
         # 'graphdata/ogbn-proteins.mtx',
         # 'graphdata/com-orkut.mtx'
+
+        # 'graphdata/mag240m.mtx',
+        # 'graphdata/twitter7.mtx',
+        # 'graphdata/uk-2006-05.mtx',
     ]
 
     for n in range(len(gpu_list)):

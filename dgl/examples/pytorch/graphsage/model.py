@@ -95,12 +95,19 @@ class AGNN(nn.Module):
         self.n_hidden = n_hidden
         self.n_classes = n_classes
         self.layers = nn.ModuleList()
-        self.proj = nn.Linear(in_feats, n_hidden)
+        # self.proj = nn.Linear(in_feats, n_hidden)
         self.layers = nn.ModuleList([
+                                    # dgl.nn.pytorch.conv.GATConv(in_feats, n_hidden, 8, allow_zero_in_degree=True)
                                     AGNNConv(1, 1, allow_zero_in_degree=True), 
                                     AGNNConv(1, 1, allow_zero_in_degree=True),
+                                    AGNNConv(1, 1, allow_zero_in_degree=True),
+                                    AGNNConv(1, 1, allow_zero_in_degree=True),
+                                    AGNNConv(1, 1, allow_zero_in_degree=True),
+                                    AGNNConv(1, 1, allow_zero_in_degree=True),
+                                    AGNNConv(1, 1, allow_zero_in_degree=True),
+                                    AGNNConv(1, 1, allow_zero_in_degree=True),
                                     ])
-        self.cls = nn.Linear(n_hidden, n_classes)
+        # self.cls = nn.Linear(n_hidden, n_classes)
 
 
     # def init(self, in_feats, n_hidden, n_classes, n_layers, activation, dropout):
