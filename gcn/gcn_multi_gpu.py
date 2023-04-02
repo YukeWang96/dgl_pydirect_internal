@@ -272,8 +272,8 @@ if __name__ == '__main__':
     graph_path = args.source  + '_dgl_graph.bin'
     mygraph,label_dict = dgl.load_graphs(graph_path)
     mygraph=mygraph[0]
+    print("dataset: ", args.source)
     
-    print("dataset: ", args.dataset)
     n_feats=args.nfeats
     n_classes=args.num_hidden
     f_tensor=th.randn(mygraph.num_nodes(),n_feats)

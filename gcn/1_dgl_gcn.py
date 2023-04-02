@@ -1,26 +1,20 @@
 import os
-import xlwt
 
 def main():
 
     # gpu_list=[2,4,8]
     # embedding_size=[16,32,64,128,256]
-
     gpu_list = [8]
     embedding_size=[16]
 
     mtx_path_list=[
         'graphdata/reddit.mtx',
-        # 'graphdata/enwiki-2013.mtx',
+        'graphdata/enwiki-2013.mtx',
         # 'graphdata/it-2004.mtx',
         # 'graphdata/papers100m.mtx',
-        # 'graphdata/ogbn-products.mtx',
-        # 'graphdata/ogbn-proteins.mtx',
-        # 'graphdata/com-orkut.mtx'
-
-        # 'graphdata/mag240m.mtx',
-        # 'graphdata/twitter7.mtx',
-        # 'graphdata/uk-2006-05.mtx',
+        'graphdata/ogbn-products.mtx',
+        'graphdata/ogbn-proteins.mtx',
+        'graphdata/com-orkut.mtx'
     ]
 
     for n in range(len(gpu_list)):
@@ -61,7 +55,6 @@ def main():
                 
                 for j in range(ngpu):
                     os.system('rm intermediate'+str(j)+'.out')
-                # os.system('mv *.log logs')
                 
 if __name__ == '__main__':
     main()
