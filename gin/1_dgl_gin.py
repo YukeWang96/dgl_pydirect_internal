@@ -2,10 +2,8 @@ import os
 
 def main():
 
-    # gpu_list=[2,4,8]
-    # embedding_size=[16,32,64,128,256]
     gpu_list = [8]
-    embedding_size=[16]
+    embedding_size=[64]
 
     mtx_path_list=[
         '../graphdata/reddit.mtx',
