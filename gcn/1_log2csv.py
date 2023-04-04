@@ -28,7 +28,7 @@ fp.close()
 fout = open(sys.argv[1].strip(".log")+".csv", 'w')
 # for fetch, aggre in zip(fetch_li, aggre_li):
 #     fout.write("{},{}\n".format(fetch, aggre))
-fout.write("dataset, time(ms)\n")
+# fout.write("dataset, time(ms)\n")
 for data, fetch, aggre in zip(data_li, fetch_li, aggre_li):
     fout.write("{},{:.3f}\n".format(data, fetch+aggre))
 fout.close()
