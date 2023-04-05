@@ -18,7 +18,7 @@ class GCN(nn.Module):
         self.n_classes = n_classes
         self.layers = nn.ModuleList()
         self.layers.append(dglnn.pytorch.conv.GraphConv(in_feats, n_hidden, norm='none', bias=False, allow_zero_in_degree=True))
-
+        self.layers.append(dglnn.pytorch.conv.GraphConv(in_feats, n_hidden, norm='none', bias=False, allow_zero_in_degree=True))
 
     def forward(self, blocks, x):
         h = x
