@@ -90,32 +90,26 @@ class GCN(nn.Module):
 class GIN(nn.Module):
     def __init__(self, in_feats, n_hidden, n_classes, n_layers, activation, dropout):
         super().__init__()
-        self.init(in_feats, n_hidden, n_classes, n_layers, activation, dropout)
 
-    def init(self, in_feats, n_hidden, n_classes, n_layers, activation, dropout):
         self.n_layers = n_layers
         self.n_hidden = n_hidden
         self.n_classes = n_classes
-        self.layers = nn.ModuleList()
+        self.activation = nn.ReLU()
         lin = th.nn.Linear(in_feats, n_hidden)
+
+        self.layers = nn.ModuleList()
         self.layers.append(GINConv(lin, 'sum'))
-        # if n_layers > 1:
-        #     self.layers.append(dglnn.SAGEConv(in_feats, n_hidden, 'mean'))
-        #     for i in range(1, n_layers - 1):
-        #         self.layers.append(dglnn.SAGEConv(n_hidden, n_hidden, 'mean'))
-        #     self.layers.append(dglnn.SAGEConv(n_hidden, n_classes, 'mean'))
-        # else:
-        #     self.layers.append(dglnn.SAGEConv(in_feats, n_classes, 'mean'))
-        # self.dropout = nn.Dropout(dropout)
-        # self.activation = activation
+        self.layers.append(GINConv(lin, 'sum'))
+        self.layers.append(GINConv(lin, 'sum'))
+        self.layers.append(GINConv(lin, 'sum'))
+        self.layers.append(GINConv(lin, 'sum'))
 
     def forward(self, blocks, x):
         h = x
         for l, (layer, block) in enumerate(zip(self.layers, blocks)):
             h = layer(block, h)
-            #if l != len(self.layers) - 1:
-            #    h = self.activation(h)
-            #    h = self.dropout(h)
+            if l != len(self.layers) - 1:
+               h = self.activation(h)
         return h
 
     '''

@@ -237,7 +237,7 @@ if __name__ == '__main__':
                            help="Comma separated list of GPU device IDs.")
     argparser.add_argument('--dataset', type=str, default='reddit')
     argparser.add_argument('--num-epochs', type=int, default=10)
-    argparser.add_argument('--num-hidden', type=int, default=16)
+    # argparser.add_argument('--num-hidden', type=int, default=16)
     argparser.add_argument('--num-layers', type=int, default=1)
     argparser.add_argument('--fan-out', type=str, default='10,25')
     argparser.add_argument('--batch-size', type=int, default=1000)
@@ -260,7 +260,10 @@ if __name__ == '__main__':
                                 "'uva' to enable UnifiedTensor (GPU zero-copy access on "
                                 "pinned host memory).")
     argparser.add_argument('--source', type=str, default='error')
+
     argparser.add_argument('--nfeats', type=int, default=16)
+    argparser.add_argument('--num-hidden', type=int, default=16)
+    argparser.add_argument('--out-classes', type=int, default=16)
     args = argparser.parse_args()
 
     devices = list(map(int, args.gpu.split(',')))
@@ -271,7 +274,7 @@ if __name__ == '__main__':
     print("dataset: ", args.source)
     
     n_feats=args.nfeats
-    n_classes=args.num_hidden
+    n_classes=args.out_classes
     f_tensor=th.randn(mygraph.num_nodes(),n_feats)
 
     l_tensor=th.randint(0,7,(mygraph.num_nodes(),))
