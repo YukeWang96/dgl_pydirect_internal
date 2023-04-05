@@ -7,7 +7,7 @@ import time
 import argparse
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
-from model import SAGE, AGNN
+from model import GIN
 import statistics
 import warnings
 warnings.filterwarnings("ignore")
@@ -87,7 +87,6 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
 
     # Create PyTorch DataLoader for constructing blocks
     sampler = dgl.dataloading.MultiLayerFullNeighborSampler(1)
-    # sampler = dgl.dataloading.NeighborSampler([25])
 
     dataloader = dgl.dataloading.NodeDataLoader(
         train_g,
@@ -103,8 +102,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         )
 
     # Define model and optimizer
-    # model = SAGE(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
-    model = AGNN(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
+    model = GIN(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
 
     #model=nn.Linear(4,2,True)
     model = model.to(device)
@@ -116,8 +114,6 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
     #    print("memory")
     #    print(th.cuda.memory_allocated(proc_id))
     #    print(th.cuda.memory_reserved(proc_id))
-    # Training loop
-    avg = 0
     avg_fetch=0
     avg_agg=0
     iter_tput = []

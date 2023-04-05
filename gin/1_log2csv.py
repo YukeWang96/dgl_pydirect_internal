@@ -32,4 +32,4 @@ fout = open(sys.argv[1].strip(".log")+".csv", 'w')
 for data, fetch, aggre in zip(data_li, fetch_li, aggre_li):
     fout.write("{},{:.3f}\n".format(data, fetch+aggre))
 fout.close()
-os.system("rm *.out")
+# os.system("rm *.out")

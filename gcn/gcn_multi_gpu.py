@@ -7,7 +7,7 @@ import time
 import argparse
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
-from model import SAGE, AGNN
+from model import GCN
 import statistics
 import warnings
 warnings.filterwarnings("ignore")
@@ -103,10 +103,8 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         )
 
     # Define model and optimizer
-    # model = SAGE(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
-    model = AGNN(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
+    model = GCN(in_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.dropout)
 
-    #model=nn.Linear(4,2,True)
     model = model.to(device)
     if n_gpus > 1:
         model = DistributedDataParallel(model, device_ids=[device], output_device=device)
@@ -116,8 +114,6 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
     #    print("memory")
     #    print(th.cuda.memory_allocated(proc_id))
     #    print(th.cuda.memory_reserved(proc_id))
-    # Training loop
-    avg = 0
     avg_fetch=0
     avg_agg=0
     iter_tput = []

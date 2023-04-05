@@ -2,7 +2,7 @@ import os
 
 def main():
 
-    gpu_list = [8]
+    gpu_list = [4]
     embedding_size=[64]
 
     mtx_path_list=[
@@ -30,7 +30,7 @@ def main():
                     os.system('touch intermediate'+str(j)+'.out')
                 
                 # profile = "/opt/nvidia/nsight-compute/2022.3.0/ncu --metrics all --devices 0 "
-                command='python gcn_multi_gpu.py --gpu '+gpuinst+' --graph-device cpu --data-device uva --source '+source+' --nfeats '+str(embed)
+                command='python gin_multi_gpu.py --gpu '+gpuinst+' --graph-device cpu --data-device uva --source '+source+' --nfeats '+str(embed)
                 # command = profile + command
 
                 print(command)
@@ -51,8 +51,8 @@ def main():
                     myfile.close()
                 writefile.close()
                 
-                for j in range(ngpu):
-                    os.system('rm intermediate'+str(j)+'.out')
+                # for j in range(ngpu):
+                #     os.system('rm intermediate'+str(j)+'.out')
                 
 if __name__ == '__main__':
     main()
