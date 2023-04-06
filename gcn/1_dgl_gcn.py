@@ -9,7 +9,7 @@ def main():
         '../graphdata/reddit.mtx',
         '../graphdata/enwiki-2013.mtx',
         '../graphdata/it-2004.mtx',
-        '../graphdata/papers100m.mtx',
+        # '../graphdata/papers100m.mtx',
         '../graphdata/ogbn-products.mtx',
         '../graphdata/ogbn-proteins.mtx',
         '../graphdata/com-orkut.mtx'
@@ -17,11 +17,11 @@ def main():
 
     dataset = [
             ( 'Reddit'                      , 602      	, 41),
-            ( 'enwiki-2013'	                , 100	    , 12),   
-            ( 'it-2004'                     , 128       , 172),
-            ( 'paper100M'                   , 128       , 172),
+            ( 'enwiki-2013'	                , 300	    , 12),   
+            ( 'it-2004'                     , 256       , 172),
+            # ( 'paper100M'                   , 768       , 172),
             ( 'ogbn-products'	            , 100	    , 47),   
-            ( 'ogbn-proteins'	            , 128		, 112),
+            ( 'ogbn-proteins'	            , 8		    , 112),
             ( 'com-Orkut'		            , 128		, 128),
     ]
 

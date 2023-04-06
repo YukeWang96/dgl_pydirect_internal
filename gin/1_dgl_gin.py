@@ -9,7 +9,7 @@ def main():
         '../graphdata/reddit.mtx',
         '../graphdata/enwiki-2013.mtx',
         '../graphdata/it-2004.mtx',
-        '../graphdata/papers100m.mtx',
+        # '../graphdata/papers100m.mtx',
         '../graphdata/ogbn-products.mtx',
         '../graphdata/ogbn-proteins.mtx',
         '../graphdata/com-orkut.mtx'
@@ -17,11 +17,11 @@ def main():
 
     dataset = [
             ( 'Reddit'                      , 602      	, 41),
-            ( 'enwiki-2013'	                , 100	    , 12),   
-            ( 'it-2004'                     , 128       , 172),
-            ( 'paper100M'                   , 128       , 172),
+            ( 'enwiki-2013'	                , 300	    , 12),   
+            ( 'it-2004'                     , 256       , 172),
+            # ( 'paper100M'                   , 768       , 172),
             ( 'ogbn-products'	            , 100	    , 47),   
-            ( 'ogbn-proteins'	            , 128		, 112),
+            ( 'ogbn-proteins'	            , 8		    , 112),
             ( 'com-Orkut'		            , 128		, 128),
     ]
 
@@ -41,11 +41,12 @@ def main():
                     os.system('touch intermediate'+str(j)+'.out')
                 
                 # profile = "/opt/nvidia/nsight-compute/2022.3.0/ncu --metrics all --devices 0 "
-                command='python gcn_multi_gpu.py --gpu '+gpuinst\
-                                +' --graph-device cpu --data-device uva --source '+source\
-                                +' --num-hidden '+str(embed) \
-                                +' --nfeats '+str(dataset[i][1]) \
-                                +' --out-classes '+str(dataset[i][2])                # command = profile + command
+                command='python gin_multi_gpu.py --gpu ' + gpuinst \
+                                +' --graph-device cpu --data-device uva --source '+source \
+                                +' --num-hidden '+ str(embed) \
+                                +' --nfeats '+ str(dataset[i][1]) \
+                                +' --out-classes ' + str(dataset[i][2])                
+                # command = profile + command
 
                 print(command)
                 os.system(command)

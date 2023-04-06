@@ -95,19 +95,27 @@ class GIN(nn.Module):
         self.n_hidden = n_hidden
         self.n_classes = n_classes
         self.activation = nn.ReLU()
-        lin = th.nn.Linear(in_feats, n_hidden)
+        lin_in = th.nn.Linear(in_feats, n_hidden)
+        lin_hid = th.nn.Linear(n_hidden, n_hidden)
+        lin_out = th.nn.Linear(n_hidden, n_hidden)
 
         self.layers = nn.ModuleList()
-        self.layers.append(GINConv(lin, 'sum'))
-        self.layers.append(GINConv(lin, 'sum'))
-        self.layers.append(GINConv(lin, 'sum'))
-        self.layers.append(GINConv(lin, 'sum'))
-        self.layers.append(GINConv(lin, 'sum'))
+        self.layers.append(lin_in)
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(lin_out)
 
     def forward(self, blocks, x):
         h = x
         for l, (layer, block) in enumerate(zip(self.layers, blocks)):
-            h = layer(block, h)
+            if l == 0 or l == len(self.layers) - 1:
+                h = layer(h)
+            else:
+                h = layer(block, h)
+                
             if l != len(self.layers) - 1:
                h = self.activation(h)
         return h
