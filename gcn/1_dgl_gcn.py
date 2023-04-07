@@ -18,11 +18,11 @@ def main():
     dataset = [
             ( 'Reddit'                      , 602      	, 41),
             ( 'enwiki-2013'	                , 300	    , 12),   
-            ( 'it-2004'                     , 256       , 172),
+            ( 'it-2004'                     , 256       , 64),
             # ( 'paper100M'                   , 768       , 172),
             ( 'ogbn-products'	            , 100	    , 47),   
             ( 'ogbn-proteins'	            , 8		    , 112),
-            ( 'com-Orkut'		            , 128		, 128),
+            ( 'com-Orkut'		            , 128		, 32),
     ]
 
 
