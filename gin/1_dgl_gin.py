@@ -43,8 +43,8 @@ def main():
                 # profile = "/opt/nvidia/nsight-compute/2022.3.0/ncu --metrics all --devices 0 "
                 command='/root/anaconda3/envs/dgl/bin/python gin_multi_gpu.py --gpu ' + gpuinst \
                                 +' --graph-device cpu --data-device uva --source '+source \
-                                +' --num-hidden '+ str(embed) \
                                 +' --nfeats '+ str(dataset[i][1]) \
+                                +' --num-hidden '+ str(embed) \
                                 +' --out-classes ' + str(dataset[i][2])                
                 # command = profile + command
 

@@ -10,7 +10,6 @@ import sklearn.metrics as skm
 import tqdm
 from dgl.nn.pytorch import GINConv
 
-
 class GCN(nn.Module):
     def __init__(self, in_feats, n_hidden, n_classes, n_layers, activation, dropout):
         super().__init__()
@@ -95,6 +94,7 @@ class GIN(nn.Module):
         self.n_hidden = n_hidden
         self.n_classes = n_classes
         self.activation = nn.ReLU()
+        
         lin_in = th.nn.Linear(in_feats, n_hidden)
         lin_hid = th.nn.Linear(n_hidden, n_hidden)
         lin_out = th.nn.Linear(n_hidden, n_hidden)
@@ -109,15 +109,13 @@ class GIN(nn.Module):
         self.layers.append(lin_out)
 
     def forward(self, blocks, x):
-        h = x
-        for l, (layer, block) in enumerate(zip(self.layers, blocks)):
-            if l == 0 or l == len(self.layers) - 1:
-                h = layer(h)
-            else:
-                h = layer(block, h)
-                
-            if l != len(self.layers) - 1:
-               h = self.activation(h)
+        with th.no_grad():
+            h = x
+            for l, (layer, block) in enumerate(zip(self.layers, blocks)):
+                if l == 0 or l == len(self.layers) - 1:
+                    h = layer(h)
+                else:
+                    h = layer(block, h)
         return h
 
     '''

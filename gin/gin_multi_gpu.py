@@ -157,7 +157,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
             #reporter.report()
             with th.no_grad():
                 batch_inputs, batch_labels = load_subtensor(train_nfeat, train_labels,
-                                                        seeds, input_nodes, device)
+                                                            seeds, input_nodes, device)
              
                 th.cuda.synchronize()
                 end_fetch = time.time()
@@ -174,7 +174,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
                 # Compute loss and prediction
                 #with th.no_grad():
                 # print("modelstart")
-                batch_pred = model(blocks, batch_inputs)
+                pred = model(blocks, batch_inputs)
                 # print("modelend")
                 th.cuda.synchronize()
                 end_agg = time.time()
