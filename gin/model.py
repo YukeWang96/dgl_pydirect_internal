@@ -94,7 +94,7 @@ class GIN(nn.Module):
         self.n_hidden = n_hidden
         self.n_classes = n_classes
         self.activation = nn.ReLU()
-        
+
         lin_in = th.nn.Linear(in_feats, n_hidden)
         lin_hid = th.nn.Linear(n_hidden, n_hidden)
         lin_out = th.nn.Linear(n_hidden, n_hidden)

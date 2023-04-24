@@ -156,6 +156,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
             #reporter = MemReporter()
             #reporter.report()
             with th.no_grad():
+                torch.cuda.empty_cache()
                 batch_inputs, batch_labels = load_subtensor(train_nfeat, train_labels,
                                                             seeds, input_nodes, device)
              

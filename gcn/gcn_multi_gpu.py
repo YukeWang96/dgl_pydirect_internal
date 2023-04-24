@@ -152,13 +152,15 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
 
             th.cuda.synchronize()
 
+            # for i in range(2): # for two-layer full-graph computation.
+
             start_fetch=time.time()
             #reporter = MemReporter()
             #reporter.report()
             with th.no_grad():
                 batch_inputs, batch_labels = load_subtensor(train_nfeat, train_labels,
                                                         seeds, input_nodes, device)
-             
+            
                 th.cuda.synchronize()
                 end_fetch = time.time()
                 fetch=fetch + end_fetch - start_fetch
