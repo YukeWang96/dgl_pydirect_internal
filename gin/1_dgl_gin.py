@@ -41,7 +41,7 @@ def main():
                     os.system('touch intermediate'+str(j)+'.out')
                 
                 # profile = "/opt/nvidia/nsight-compute/2022.3.0/ncu --metrics all --devices 0 "
-                command='python gin_multi_gpu.py --gpu ' + gpuinst \
+                command='/root/anaconda3/envs/dgl/bin/python gin_multi_gpu.py --gpu ' + gpuinst \
                                 +' --graph-device cpu --data-device uva --source '+source \
                                 +' --num-hidden '+ str(embed) \
                                 +' --nfeats '+ str(dataset[i][1]) \

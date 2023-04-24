@@ -10,6 +10,8 @@ from tqdm import tqdm
 from model import GCN
 import statistics
 import warnings
+import torch
+
 warnings.filterwarnings("ignore")
 
 def compute_acc(pred, labels):
@@ -230,6 +232,7 @@ def run(proc_id, n_gpus, args, devices, data, my_batch_size):
         print('MAX Iter (ms):\t{:.3f}'.format(max(iter_time)*1e3))
         print([i*1e3 for i in iter_time])
 
+
 if __name__ == '__main__':
     #th.multiprocessing.set_start_method('spawn')
     argparser = argparse.ArgumentParser("multi-gpu training")
@@ -359,3 +362,12 @@ if __name__ == '__main__':
             procs.append(p)
         for p in procs:
             p.join()
+    
+
+    # get the number of available GPUs
+    device_count = torch.cuda.device_count()
+
+    # loop over all available GPUs and release memory and clear cache for each one
+    for i in range(device_count):
+        with torch.cuda.device(i):
+            torch.cuda.empty_cache()

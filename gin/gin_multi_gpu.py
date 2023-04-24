@@ -10,6 +10,8 @@ from tqdm import tqdm
 from model import GIN
 import statistics
 import warnings
+import torch
+
 warnings.filterwarnings("ignore")
 
 def compute_acc(pred, labels):
@@ -361,3 +363,11 @@ if __name__ == '__main__':
             procs.append(p)
         for p in procs:
             p.join()
+
+    # get the number of available GPUs
+    device_count = torch.cuda.device_count()
+
+    # loop over all available GPUs and release memory and clear cache for each one
+    for i in range(device_count):
+        with torch.cuda.device(i):
+            torch.cuda.empty_cache()
