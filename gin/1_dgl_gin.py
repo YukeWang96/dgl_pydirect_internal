@@ -3,13 +3,13 @@ import os
 def main():
 
     gpu_list = [8]
-    embedding_size=[32]
+    embedding_size=[64]
 
     mtx_path_list=[
         '../graphdata/reddit.mtx',
         '../graphdata/enwiki-2013.mtx',
         '../graphdata/it-2004.mtx',
-        '../graphdata/papers100m.mtx',
+        # '../graphdata/papers100m.mtx',
         '../graphdata/ogbn-products.mtx',
         '../graphdata/ogbn-proteins.mtx',
         '../graphdata/com-orkut.mtx'
@@ -19,7 +19,7 @@ def main():
             ( 'Reddit'                      , 602      	, 41),
             ( 'enwiki-2013'	                , 300	    , 12),   
             ( 'it-2004'                     , 256       , 64),
-            ( 'paper100M'                   , 128       , 64),
+            # ( 'paper100M'                   , 128       , 64),
             ( 'ogbn-products'	            , 100	    , 47),   
             ( 'ogbn-proteins'	            , 8		    , 112),
             ( 'com-Orkut'		            , 128		, 32),

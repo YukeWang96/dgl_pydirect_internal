@@ -9,11 +9,7 @@ def main():
         # '../graphdata/reddit.mtx',
         # '../graphdata/enwiki-2013.mtx',
         # '../graphdata/it-2004.mtx',
-<<<<<<< HEAD
         '../graphdata/papers100m.mtx', # running seperately
-=======
-        '../graphdata/papers100m.mtx',
->>>>>>> f3528c634191ef9b948237a58a775554922ec725
         # '../graphdata/ogbn-products.mtx',
         # '../graphdata/ogbn-proteins.mtx',
         # '../graphdata/com-orkut.mtx'
@@ -23,11 +19,7 @@ def main():
             # ( 'Reddit'                      , 602      	, 41),
             # ( 'enwiki-2013'	                , 300	    , 12),   
             # ( 'it-2004'                     , 256       , 64),
-<<<<<<< HEAD
             ( 'paper100M'                   , 128       , 64), # running seperately
-=======
-            ( 'paper100M'                   , 768       , 172),
->>>>>>> f3528c634191ef9b948237a58a775554922ec725
             # ( 'ogbn-products'	            , 100	    , 47),   
             # ( 'ogbn-proteins'	            , 8		    , 112),
             # ( 'com-Orkut'		            , 128		, 32),

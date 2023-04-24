@@ -102,10 +102,10 @@ class GIN(nn.Module):
         self.layers = nn.ModuleList()
         self.layers.append(lin_in)
         self.layers.append(GINConv(lin_hid, 'sum'))
-        # self.layers.append(GINConv(lin_hid, 'sum'))
-        # self.layers.append(GINConv(lin_hid, 'sum'))
-        # self.layers.append(GINConv(lin_hid, 'sum'))
-        # self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
+        self.layers.append(GINConv(lin_hid, 'sum'))
         self.layers.append(lin_out)
 
     def forward(self, blocks, x):
