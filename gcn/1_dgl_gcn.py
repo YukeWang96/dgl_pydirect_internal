@@ -6,25 +6,24 @@ def main():
     embedding_size=[16]
 
     mtx_path_list=[
-        # '../graphdata/reddit.mtx',
-        # '../graphdata/enwiki-2013.mtx',
-        # '../graphdata/it-2004.mtx',
+        '../graphdata/reddit.mtx',
+        '../graphdata/enwiki-2013.mtx',
+        '../graphdata/it-2004.mtx',
         '../graphdata/papers100m.mtx',
-        # '../graphdata/ogbn-products.mtx',
-        # '../graphdata/ogbn-proteins.mtx',
-        # '../graphdata/com-orkut.mtx'
+        '../graphdata/ogbn-products.mtx',
+        '../graphdata/ogbn-proteins.mtx',
+        '../graphdata/com-orkut.mtx'
     ]
 
     dataset = [
-            # ( 'Reddit'                      , 602      	, 41),
-            # ( 'enwiki-2013'	                , 300	    , 12),   
-            # ( 'it-2004'                     , 256       , 64),
-            ( 'paper100M'                   , 768       , 172),
-            # ( 'ogbn-products'	            , 100	    , 47),   
-            # ( 'ogbn-proteins'	            , 8		    , 112),
-            # ( 'com-Orkut'		            , 128		, 32),
+                ( 'Reddit'                      , 602      	, 41),
+                ( 'enwiki-2013'	                , 300	    , 12),   
+                ( 'it-2004'                     , 256       , 64),
+                ( 'paper100M'                   , 128       , 64),
+                ( 'ogbn-products'	            , 100	    , 47),   
+                ( 'ogbn-proteins'	            , 8		    , 112),
+                ( 'com-Orkut'		            , 128       , 32),
     ]
-
 
     for n in range(len(gpu_list)):
         ngpu=gpu_list[n]
